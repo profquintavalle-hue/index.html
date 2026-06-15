@@ -283,9 +283,9 @@
       <p>Allegato A &mdash; Esame di Stato 2026 &mdash; Max 20 punti</p>
     </div>
     <div class="header-actions no-print">
-      <button class="btn" onclick="esportaJSON()">⬇ Esporta dati</button>
-      <label class="btn" style="cursor:pointer;">⬆ Importa dati<input type="file" accept=".json" onchange="importaJSON(event)" style="display:none"></label>
-      <button class="btn" onclick="window.print()">🖨 Stampa</button>
+      <button class="btn" onclick="esportaJSON()">⬇ Backup dati</button>
+      <label class="btn" style="cursor:pointer;">⬆ Ripristina<input type="file" accept=".json" onchange="importaJSON(event)" style="display:none"></label>
+      <button class="btn btn-green" onclick="stampaRiepilogo()">🖨 Stampa riepilogo</button>
     </div>
   </div>
 
@@ -561,6 +561,74 @@ function renderRegistro() {
     list.appendChild(item);
   });
   el.appendChild(list);
+}
+
+function stampaRiepilogo() {
+  if (!candidati.length) { alert('Nessun candidato salvato da stampare.'); return; }
+
+  const nomi_indicatori = [
+    'Acquisizione dei contenuti e dei metodi',
+    'Capacità di raccordare le conoscenze; padronanza lessicale',
+    'Capacità di argomentare in modo critico e personale',
+    'Grado di maturazione personale e autonomia'
+  ];
+
+  const righe = candidati.map((c, i) => {
+    const pts = c.ptsAssegnato ?? c.ptsProposto;
+    const completo = Object.keys(c.selezioni).length === 4;
+    const dettagli = INDICATORI.map((ind, j) => {
+      const sel = c.selezioni[ind.id];
+      if (sel === undefined) return `<tr><td>${nomi_indicatori[j]}</td><td style="text-align:center">—</td><td>—</td></tr>`;
+      const l = ind.livelli[sel];
+      return `<tr><td>${nomi_indicatori[j]}</td><td style="text-align:center">Livello ${l.romano} (${l.range})</td><td style="font-size:11px;color:#444">${l.desc}</td></tr>`;
+    }).join('');
+
+    return `
+      <div style="page-break-inside:avoid; margin-bottom:28px; border:1px solid #ccc; border-radius:8px; padding:16px 20px;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;">
+          <div>
+            <div style="font-size:11px;color:#888;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px">Candidato ${i+1}</div>
+            <div style="font-size:18px;font-weight:600">${c.nome}</div>
+          </div>
+          <div style="text-align:right">
+            <div style="font-size:11px;color:#888;margin-bottom:2px">${c.ptsAssegnato ? 'Punteggio assegnato' : 'Punteggio proposto'}</div>
+            <div style="font-size:28px;font-weight:700;color:#0F6E56">${pts != null ? pts + '<span style="font-size:14px;font-weight:400;color:#888">/20</span>' : '—'}</div>
+          </div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:${c.nota ? '12px' : '0'}">
+          <thead>
+            <tr style="background:#f5f4f0">
+              <th style="text-align:left;padding:6px 8px;border:1px solid #ddd;width:35%">Indicatore</th>
+              <th style="text-align:center;padding:6px 8px;border:1px solid #ddd;width:18%">Livello</th>
+              <th style="text-align:left;padding:6px 8px;border:1px solid #ddd">Descrittore</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${dettagli.replace(/<tr>/g, '<tr style="border:1px solid #ddd">').replace(/<td>/g, '<td style="padding:6px 8px;border:1px solid #ddd;vertical-align:top">').replace(/<td style="text-align:center">/g, '<td style="padding:6px 8px;border:1px solid #ddd;text-align:center;vertical-align:top">').replace(/<td style="font-size:11px;color:#444">/g, '<td style="padding:6px 8px;border:1px solid #ddd;font-size:11px;color:#444;vertical-align:top">')}
+          </tbody>
+        </table>
+        ${c.nota ? `<div style="font-size:12px;color:#444;border-top:1px solid #eee;padding-top:8px"><strong>Note:</strong> ${c.nota}</div>` : ''}
+      </div>`;
+  }).join('');
+
+  const html = `<!DOCTYPE html><html lang="it"><head><meta charset="UTF-8">
+    <title>Riepilogo colloqui — Maturità 2026</title>
+    <style>
+      body { font-family: -apple-system, sans-serif; padding: 24px; max-width: 900px; margin: 0 auto; color: #1a1917; }
+      h1 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+      p { font-size: 12px; color: #888; margin-bottom: 24px; }
+      @media print { body { padding: 0; } }
+    </style>
+  </head><body>
+    <h1>Riepilogo valutazioni — Colloquio orale</h1>
+    <p>Allegato A — Esame di Stato 2026 — ${candidati.length} candidat${candidati.length === 1 ? 'o' : 'i'}</p>
+    ${righe}
+  </body></html>`;
+
+  const w = window.open('', '_blank');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(() => w.print(), 500);
 }
 
 caricaDaStorage();
