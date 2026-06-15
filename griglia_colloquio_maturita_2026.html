@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Griglia Colloquio Orale — Maturità 2026</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg2: #f5f4f0;
+    --bg3: #eeece7;
+    --border: #d8d6ce;
+    --border2: #c2c0b8;
+    --text: #1a1917;
+    --text2: #5a5854;
+    --text3: #8a8884;
+    --green-bg: #E1F5EE;
+    --green-border: #0F6E56;
+    --green-text: #085041;
+    --green-mid: #0F6E56;
+    --green-light: #E1F5EE;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1b19;
+      --bg2: #252420;
+      --bg3: #2e2d29;
+      --border: #3a3834;
+      --border2: #4a4844;
+      --text: #f0ede8;
+      --text2: #a0998f;
+      --text3: #6a6560;
+      --green-bg: #04342C;
+      --green-border: #1D9E75;
+      --green-text: #9FE1CB;
+      --green-mid: #1D9E75;
+      --green-light: #04342C;
+    }
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg2);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 24px 16px 48px;
+  }
+
+  .page { max-width: 780px; margin: 0 auto; }
+
+  /* HEADER */
+  .app-header {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .app-header h1 { font-size: 16px; font-weight: 600; color: var(--text); }
+  .app-header p { font-size: 12px; color: var(--text3); margin-top: 3px; }
+
+  .header-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+  /* CANDIDATO BAR */
+  .candidato-section {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .candidato-section label { font-size: 13px; color: var(--text2); white-space: nowrap; }
+  .candidato-section input {
+    flex: 1;
+    min-width: 200px;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 7px 12px;
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius-sm);
+    background: var(--bg2);
+    color: var(--text);
+  }
+  .candidato-section input:focus { outline: 2px solid var(--green-mid); outline-offset: 1px; }
+
+  /* BUTTONS */
+  .btn {
+    font-size: 12px;
+    font-family: inherit;
+    padding: 7px 14px;
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius-sm);
+    background: var(--bg);
+    color: var(--text);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.15s;
+  }
+  .btn:hover { background: var(--bg2); }
+  .btn-green {
+    background: var(--green-mid);
+    color: #E1F5EE;
+    border-color: var(--green-mid);
+    font-weight: 600;
+  }
+  .btn-green:hover { opacity: 0.88; }
+  .btn-danger { color: #A32D2D; border-color: #F0959580; }
+  .btn-danger:hover { background: #FCEBEB; }
+  .btn-sm { padding: 4px 10px; font-size: 11px; }
+
+  /* INDICATORI */
+  .indicatori { display: flex; flex-direction: column; gap: 12px; margin-bottom: 16px; }
+
+  .indicatore-card {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+  }
+  .ind-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .ind-title { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.45; margin-bottom: 12px; }
+
+  .livelli-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+
+  .livello-btn {
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px 4px;
+    cursor: pointer;
+    background: var(--bg2);
+    color: var(--text);
+    font-family: inherit;
+    text-align: center;
+    transition: all 0.15s;
+  }
+  .livello-btn:hover { border-color: var(--border2); background: var(--bg3); }
+  .livello-btn .l-num { font-size: 11px; font-weight: 600; color: var(--text3); margin-bottom: 2px; }
+  .livello-btn .l-pts { font-size: 12px; font-weight: 500; color: var(--text); }
+
+  .livello-btn.selected { border-color: var(--green-mid); background: var(--green-light); }
+  .livello-btn.selected .l-num { color: var(--green-text); }
+  .livello-btn.selected .l-pts { color: var(--green-mid); font-weight: 700; }
+
+  .descrittore-box {
+    margin-top: 10px;
+    padding: 10px 14px;
+    background: var(--green-light);
+    border-left: 3px solid var(--green-mid);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    display: none;
+  }
+  .descrittore-box.visible { display: block; }
+  .d-livello { font-size: 11px; font-weight: 700; color: var(--green-text); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.03em; }
+  .d-testo { font-size: 12.5px; color: var(--green-text); line-height: 1.55; }
+
+  /* PUNTEGGIO */
+  .punteggio-section {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .pts-proposto-label { font-size: 12px; color: var(--text3); margin-bottom: 4px; }
+  .pts-proposto-value { font-size: 32px; font-weight: 600; color: var(--text); }
+  .pts-proposto-value span { font-size: 16px; font-weight: 400; color: var(--text3); margin-left: 2px; }
+  .pts-assegnato-row { display: flex; align-items: center; gap: 10px; }
+  .pts-assegnato-row label { font-size: 13px; color: var(--text2); }
+  .pts-assegnato-row input {
+    width: 72px;
+    font-size: 18px;
+    font-weight: 600;
+    padding: 6px 8px;
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius-sm);
+    background: var(--bg2);
+    color: var(--text);
+    text-align: center;
+    font-family: inherit;
+  }
+  .pts-assegnato-row input:focus { outline: 2px solid var(--green-mid); outline-offset: 1px; }
+
+  .nota-section {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+  }
+  .nota-section label { font-size: 13px; color: var(--text2); padding-top: 6px; white-space: nowrap; }
+  .nota-section textarea {
+    flex: 1;
+    font-size: 13px;
+    font-family: inherit;
+    padding: 7px 10px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg2);
+    color: var(--text);
+    resize: vertical;
+    min-height: 50px;
+  }
+  .nota-section textarea:focus { outline: 2px solid var(--green-mid); outline-offset: 1px; }
+
+  /* REGISTRO */
+  .registro-section {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+  }
+  .registro-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .registro-title { font-size: 13px; font-weight: 600; color: var(--text2); }
+  .registro-count { font-size: 11px; color: var(--text3); }
+  .registro-empty { font-size: 13px; color: var(--text3); padding: 12px 0; }
+  .registro-list { display: flex; flex-direction: column; gap: 6px; }
+
+  .reg-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.15s;
+    background: var(--bg2);
+  }
+  .reg-item:hover { border-color: var(--border2); background: var(--bg3); }
+  .reg-item.active { border-color: var(--green-mid); background: var(--green-light); }
+  .reg-nome { font-size: 13px; font-weight: 500; color: var(--text); }
+  .reg-item.active .reg-nome { color: var(--green-text); }
+  .badge { font-size: 10px; padding: 2px 7px; border-radius: 99px; font-weight: 600; }
+  .badge-ok { background: var(--green-mid); color: #E1F5EE; }
+  .badge-bozza { background: var(--bg3); color: var(--text3); border: 0.5px solid var(--border); }
+  .reg-pts { font-size: 13px; font-weight: 700; color: var(--green-mid); min-width: 40px; text-align: right; }
+  .reg-pts.empty { color: var(--text3); font-weight: 400; }
+
+  /* STAMPA */
+  @media print {
+    body { background: white; padding: 0; }
+    .no-print { display: none !important; }
+    .page { max-width: 100%; }
+    .app-header, .candidato-section, .registro-section { border: 1px solid #ccc; }
+    .indicatore-card { border: 1px solid #ccc; break-inside: avoid; }
+    .punteggio-section { border: 1px solid #ccc; }
+    .btn-green, .btn { display: none; }
+    .print-only { display: block !important; }
+  }
+
+  .divider { height: 0.5px; background: var(--border); margin: 16px 0; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="app-header">
+    <div>
+      <h1>Griglia di valutazione — colloquio orale</h1>
+      <p>Allegato A &mdash; Esame di Stato 2026 &mdash; Max 20 punti</p>
+    </div>
+    <div class="header-actions no-print">
+      <button class="btn" onclick="esportaJSON()">⬇ Esporta dati</button>
+      <label class="btn" style="cursor:pointer;">⬆ Importa dati<input type="file" accept=".json" onchange="importaJSON(event)" style="display:none"></label>
+      <button class="btn" onclick="window.print()">🖨 Stampa</button>
+    </div>
+  </div>
+
+  <div class="candidato-section no-print">
+    <label for="nomeInput">Candidato:</label>
+    <input type="text" id="nomeInput" placeholder="Nome e cognome" />
+    <button class="btn btn-green" onclick="salvaCandidato()">Salva</button>
+    <button class="btn" onclick="nuovoCandidato()">+ Nuovo</button>
+  </div>
+
+  <div class="indicatori" id="indicatoriContainer"></div>
+
+  <div class="punteggio-section">
+    <div>
+      <div class="pts-proposto-label">Punteggio proposto</div>
+      <div class="pts-proposto-value" id="punteggioCalc">—<span>/ 20</span></div>
+    </div>
+    <div class="pts-assegnato-row">
+      <label for="punteggioFinal">Punteggio assegnato dalla commissione:</label>
+      <input type="number" id="punteggioFinal" min="1" max="20" step="0.5" placeholder="—" />
+    </div>
+  </div>
+
+  <div class="nota-section">
+    <label for="notaInput">Note:</label>
+    <textarea id="notaInput" rows="2" placeholder="Osservazioni sulla prova del candidato..."></textarea>
+  </div>
+
+  <div class="registro-section no-print">
+    <div class="registro-header">
+      <span class="registro-title">Candidati salvati</span>
+      <span class="registro-count" id="registroCount"></span>
+    </div>
+    <div id="registroList"><div class="registro-empty">Nessun candidato ancora salvato.</div></div>
+  </div>
+
+</div>
+
+<script>
+const STORAGE_KEY = 'griglia_maturita_2026';
+
+const INDICATORI = [
+  {
+    id: 'contenuti',
+    label: 'Indicatore 1',
+    title: 'Acquisizione dei contenuti e dei metodi delle quattro discipline oggetto del colloquio',
+    livelli: [
+      { romano: 'I', range: '0.50–1', val: 0.75, desc: 'Non ha acquisito i contenuti e i metodi delle diverse discipline, o li ha acquisiti in modo estremamente frammentario e lacunoso.' },
+      { romano: 'II', range: '1.50–2.50', val: 2, desc: 'Ha acquisito i contenuti e i metodi delle diverse discipline in modo parziale e/o incompleto, e li utilizza in modo non sempre appropriato.' },
+      { romano: 'III', range: '3–3.50', val: 3.25, desc: 'Ha acquisito i contenuti e utilizza i metodi delle diverse discipline in modo corretto e appropriato.' },
+      { romano: 'IV', range: '4–4.50', val: 4.25, desc: 'Ha acquisito i contenuti delle diverse discipline in maniera completa e utilizza in modo consapevole i relativi metodi.' },
+      { romano: 'V', range: '5', val: 5, desc: 'Ha acquisito i contenuti delle diverse discipline in maniera completa e approfondita e utilizza con piena padronanza i relativi metodi.' },
+    ]
+  },
+  {
+    id: 'raccordi',
+    label: 'Indicatore 2',
+    title: 'Capacità di utilizzare e raccordare le conoscenze acquisite; padronanza lessicale e semantica, anche tecnica/di settore',
+    livelli: [
+      { romano: 'I', range: '0.50–1', val: 0.75, desc: 'Non è in grado di utilizzare e raccordare le conoscenze acquisite o lo fa in modo del tutto inadeguato. Si esprime in modo scorretto e/o stentato.' },
+      { romano: 'II', range: '1.50–2.50', val: 2, desc: 'È in grado di utilizzare e raccordare le conoscenze acquisite con difficoltà e solo se guidato. Si esprime in modo non sempre corretto, utilizzando un lessico, anche di settore, parzialmente adeguato.' },
+      { romano: 'III', range: '3–3.50', val: 3.25, desc: 'È in grado di utilizzare correttamente le conoscenze acquisite, istituendo adeguati raccordi tra le discipline. Si esprime utilizzando un lessico complessivamente corretto, anche in riferimento al linguaggio tecnico e/o di settore.' },
+      { romano: 'IV', range: '4–4.50', val: 4.25, desc: 'È in grado di utilizzare le conoscenze acquisite raccordandole in una trattazione pluridisciplinare articolata. Si esprime in modo preciso e accurato utilizzando un lessico, anche tecnico e settoriale, vario e preciso.' },
+      { romano: 'V', range: '5', val: 5, desc: 'È in grado di utilizzare le conoscenze acquisite raccordandole in una trattazione pluridisciplinare ampia e approfondita. Si esprime con ricchezza e piena padronanza lessicale e semantica, anche in riferimento al linguaggio tecnico e/o di settore.' },
+    ]
+  },
+  {
+    id: 'argomentazione',
+    label: 'Indicatore 3',
+    title: 'Capacità di argomentare in modo critico e personale',
+    livelli: [
+      { romano: 'I', range: '0.50–1', val: 0.75, desc: 'Non è in grado di argomentare in maniera critica e personale, o argomenta in modo superficiale e disorganico.' },
+      { romano: 'II', range: '1.50–2.50', val: 2, desc: 'È in grado di formulare argomentazioni critiche e personali solo a tratti e/o solo in relazione a specifici argomenti.' },
+      { romano: 'III', range: '3–3.50', val: 3.25, desc: 'È in grado di formulare semplici argomentazioni critiche e personali, rielaborando correttamente i contenuti acquisiti.' },
+      { romano: 'IV', range: '4–4.50', val: 4.25, desc: 'È in grado di formulare articolate argomentazioni critiche e personali, rielaborando efficacemente i contenuti acquisiti.' },
+      { romano: 'V', range: '5', val: 5, desc: 'È in grado di formulare ampie e articolate argomentazioni critiche e personali, rielaborando con originalità i contenuti acquisiti.' },
+    ]
+  },
+  {
+    id: 'maturazione',
+    label: 'Indicatore 4',
+    title: 'Grado di maturazione personale, di autonomia e di responsabilità al termine del percorso di studio',
+    livelli: [
+      { romano: 'I', range: '0.50–1', val: 0.75, desc: 'Ha raggiunto un grado di maturazione molto parziale e un livello di autonomia e responsabilità incompleto.' },
+      { romano: 'II', range: '1.50–2.50', val: 2, desc: 'Ha raggiunto un limitato grado di maturazione e di autonomia; necessita di guida e di supporto per gestire scelte e responsabilità.' },
+      { romano: 'III', range: '3–3.50', val: 3.25, desc: 'Ha raggiunto un apprezzabile livello di maturazione; è in grado di assumere decisioni autonome e gestire con sicurezza scelte personali.' },
+      { romano: 'IV', range: '4–4.50', val: 4.25, desc: 'Ha raggiunto un alto grado di maturazione, autonomia e responsabilità; è capace di riflettere criticamente sulle proprie scelte e sul proprio agire.' },
+      { romano: 'V', range: '5', val: 5, desc: 'Ha raggiunto un elevato grado di autonomia e maturazione personale; sa gestire responsabilità significative in modo esemplare per gli altri.' },
+    ]
+  }
+];
+
+let selezioni = {};
+let candidati = [];
+let candidatoAttivo = null;
+
+function caricaDaStorage() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) candidati = JSON.parse(raw);
+  } catch(e) { candidati = []; }
+}
+
+function salvaSuStorage() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(candidati));
+}
+
+function esportaJSON() {
+  const blob = new Blob([JSON.stringify(candidati, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'griglia_maturita_2026.json';
+  a.click();
+}
+
+function importaJSON(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      candidati = JSON.parse(ev.target.result);
+      salvaSuStorage();
+      renderRegistro();
+      alert('Dati importati: ' + candidati.length + ' candidati.');
+    } catch(err) { alert('Errore nella lettura del file.'); }
+  };
+  reader.readAsText(file);
+}
+
+function renderIndicatori() {
+  const container = document.getElementById('indicatoriContainer');
+  container.innerHTML = '';
+  INDICATORI.forEach(ind => {
+    const card = document.createElement('div');
+    card.className = 'indicatore-card';
+    const btns = ind.livelli.map((l, i) => `
+      <button class="livello-btn" id="btn_${ind.id}_${i}" onclick="selezionaLivello('${ind.id}', ${i})">
+        <div class="l-num">${l.romano}</div>
+        <div class="l-pts">${l.range}</div>
+      </button>`).join('');
+    card.innerHTML = `
+      <div class="ind-label">${ind.label}</div>
+      <div class="ind-title">${ind.title}</div>
+      <div class="livelli-grid">${btns}</div>
+      <div class="descrittore-box" id="desc_${ind.id}">
+        <div class="d-livello" id="desc_liv_${ind.id}"></div>
+        <div class="d-testo" id="desc_txt_${ind.id}"></div>
+      </div>`;
+    container.appendChild(card);
+  });
+  aggiornaSelezioni();
+}
+
+function selezionaLivello(indId, i) {
+  selezioni[indId] = i;
+  aggiornaSelezioni();
+}
+
+function aggiornaSelezioni() {
+  INDICATORI.forEach(ind => {
+    const sel = selezioni[ind.id];
+    ind.livelli.forEach((l, i) => {
+      const btn = document.getElementById('btn_' + ind.id + '_' + i);
+      if (btn) btn.classList.toggle('selected', sel === i);
+    });
+    const box = document.getElementById('desc_' + ind.id);
+    const livEl = document.getElementById('desc_liv_' + ind.id);
+    const txtEl = document.getElementById('desc_txt_' + ind.id);
+    if (box && sel !== undefined) {
+      const l = ind.livelli[sel];
+      livEl.textContent = 'Livello ' + l.romano + ' — ' + l.range + ' punti';
+      txtEl.textContent = l.desc;
+      box.classList.add('visible');
+    } else if (box) {
+      box.classList.remove('visible');
+    }
+  });
+  calcolaPunteggio();
+}
+
+function calcolaPunteggio() {
+  const ids = INDICATORI.map(i => i.id);
+  const tutti = ids.every(id => selezioni[id] !== undefined);
+  const el = document.getElementById('punteggioCalc');
+  if (!tutti) { el.innerHTML = '—<span>/ 20</span>'; return null; }
+  let tot = 0;
+  ids.forEach(id => { tot += INDICATORI.find(i => i.id === id).livelli[selezioni[id]].val; });
+  tot = Math.min(20, Math.max(1, tot));
+  const disp = tot % 1 === 0 ? tot : tot.toFixed(2);
+  el.innerHTML = disp + '<span>/ 20</span>';
+  return tot;
+}
+
+function nuovoCandidato() {
+  selezioni = {};
+  candidatoAttivo = null;
+  document.getElementById('nomeInput').value = '';
+  document.getElementById('punteggioFinal').value = '';
+  document.getElementById('notaInput').value = '';
+  aggiornaSelezioni();
+  renderRegistro();
+  document.getElementById('nomeInput').focus();
+}
+
+function salvaCandidato() {
+  const nome = document.getElementById('nomeInput').value.trim();
+  if (!nome) { document.getElementById('nomeInput').focus(); return; }
+  const ptsProposto = calcolaPunteggio();
+  const ptsRaw = document.getElementById('punteggioFinal').value;
+  const nota = document.getElementById('notaInput').value.trim();
+  const dati = {
+    nome,
+    selezioni: { ...selezioni },
+    ptsProposto,
+    ptsAssegnato: ptsRaw ? parseFloat(ptsRaw) : null,
+    nota,
+    ts: Date.now()
+  };
+  if (candidatoAttivo !== null) {
+    candidati[candidatoAttivo] = dati;
+  } else {
+    candidati.push(dati);
+    candidatoAttivo = candidati.length - 1;
+  }
+  salvaSuStorage();
+  renderRegistro();
+}
+
+function caricaCandidato(idx) {
+  const c = candidati[idx];
+  candidatoAttivo = idx;
+  document.getElementById('nomeInput').value = c.nome;
+  selezioni = { ...c.selezioni };
+  document.getElementById('punteggioFinal').value = c.ptsAssegnato ?? '';
+  document.getElementById('notaInput').value = c.nota ?? '';
+  aggiornaSelezioni();
+  renderRegistro();
+}
+
+function eliminaCandidato(idx, e) {
+  e.stopPropagation();
+  if (!confirm('Eliminare ' + candidati[idx].nome + '?')) return;
+  candidati.splice(idx, 1);
+  salvaSuStorage();
+  if (candidatoAttivo === idx) nuovoCandidato();
+  else { if (candidatoAttivo > idx) candidatoAttivo--; renderRegistro(); }
+}
+
+function renderRegistro() {
+  const el = document.getElementById('registroList');
+  const cnt = document.getElementById('registroCount');
+  cnt.textContent = candidati.length ? candidati.length + ' candidat' + (candidati.length === 1 ? 'o' : 'i') : '';
+  if (!candidati.length) { el.innerHTML = '<div class="registro-empty">Nessun candidato ancora salvato.</div>'; return; }
+  el.innerHTML = '';
+  const list = document.createElement('div');
+  list.className = 'registro-list';
+  candidati.forEach((c, i) => {
+    const pts = c.ptsAssegnato ?? c.ptsProposto;
+    const completo = Object.keys(c.selezioni).length === 4;
+    const item = document.createElement('div');
+    item.className = 'reg-item' + (candidatoAttivo === i ? ' active' : '');
+    item.onclick = () => caricaCandidato(i);
+    item.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
+        <span class="badge ${completo ? 'badge-ok' : 'badge-bozza'}">${completo ? 'completo' : 'bozza'}</span>
+        <span class="reg-nome">${c.nome}</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="reg-pts ${pts == null ? 'empty' : ''}">${pts != null ? pts + '/20' : '—'}</span>
+        <button class="btn btn-sm btn-danger" onclick="eliminaCandidato(${i}, event)">✕</button>
+      </div>`;
+    list.appendChild(item);
+  });
+  el.appendChild(list);
+}
+
+caricaDaStorage();
+renderIndicatori();
+renderRegistro();
+</script>
+</body>
+</html>
